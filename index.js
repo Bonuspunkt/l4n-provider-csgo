@@ -1,10 +1,21 @@
-const getLobbyDefinition = require('./lib/getLobbyDefinition');
-const spawnServer = require('./lib/spawnServer');
+const lobbyDefinition = require('./lib/getLobbyDefinition');
+const lobbySettingsToArgs = require('./lib/lobbySettingsToArgs');
+const query = require('./lib/query');
 
-module.exports = {
-    getLobbyDefinition,
-    spawn: spawnServer
+module.exports = function({ workingDir, keyPool }) {
+    return {
+        definition: {
+            id: 'csgo',
+            steamId: 730,
+            name: 'Counter-Strike: Global Offensive',
+        },
+        launch: {
+            win32: 'srcds.exe',
+            linux: 'srcds_run',
+        },
+        workingDir,
+        lobbyDefinition: lobbyDefinition({ workingDir }),
+        lobbySettingsToArgs,
+        query,
+    };
 };
-
-const config = getLobbyDefinition({ workingDir: 'E:/SteamCMD/servers/csgo' });
-console.log(config);
