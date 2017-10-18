@@ -1,14 +1,66 @@
 {
   "name": "l4n-provider-csgo",
   "version": "0.5.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint --ignore-path .gitignore  .",
+    "test": "node test.js"
   },
   "author": "Bonuspunkt",
   "dependencies": {
-    "debug": "^3.0.0",
     "l4n-query": "0.0.0"
-  }
+  },
+  "devDependencies": {
+    "eslint": "4.8.0",
+    "eslint-plugin-prettier": "^2.3.1",
+    "prettier": "^1.7.4"
+  },
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "node": true,
+      "mocha": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2017,
+      "ecmaFeatures": {
+        "experimentalObjectRestSpread": true
+      }
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "no-unused-vars": [
+        "error",
+        {
+          "vars": "all",
+          "args": "none"
+        }
+      ],
+      "prettier/prettier": [
+        "error",
+        {
+          "printWidth": 100,
+          "singleQuote": true,
+          "tabWidth": 4,
+          "trailingComma": "all"
+        }
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bonuspunkt/l4n-provider-csgo.git"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bonuspunkt/l4n-provider-csgo/issues"
+  },
+  "homepage": "https://github.com/Bonuspunkt/l4n-provider-csgo#readme",
+  "description": ""
 }

@@ -19,57 +19,103 @@ Arms race is a gun-progression mode featuring instant respawning and a ton of cl
 Players gain new weapons immediately after registering a kill as they work their way through each weapon in the game.
 Get a kill with the final weapon, a golden knife, and win the match.`;
 
-
-const modes = [{
-    id: 'casual',
-    name: 'Classic Casual',
-    lobby: { minPlayers: 4, maxPlayers: 20, publicInfo: headline + publicCasual },
-    args: ['+game_type', '0', '+game_mode', '0', '+mapgroup', 'mg_active', '+map', 'de_dust2'],
-}, {
-    id: 'comp',
-    name: 'Classic Competitive',
-    lobby: { minPlayers: 5, maxPlayers: 10, publicInfo: headline + publicComp },
-    args: ['+game_type', '0', '+game_mode', '1', '+mapgroup', 'mg_active', '+map', 'de_dust2'],
-}, {
-    id: 'gungame',
-    name: 'Arms Race',
-    lobby: { minPlayers: 2, maxPlayers: 10, publicInfo: headline + publicGungame },
-    args: ['+game_type', '1', '+game_mode', '0', '+mapgroup', 'mg_armsrace', '+map', 'ar_shoots'],
-}, {
-    id: 'demo',
-    name: 'Demolition',
-    lobby: { minPlayers: 2, maxPlayers: 10, publicInfo: headline + publicDemo },
-    args: ['+game_type', '1', '+game_mode', '1', '+mapgroup', 'mg_demolition', '+map', 'de_lake'],
-}];
-
-function getArgs({ lobby, port }) {
-    const { args: dynArgs } = modes.find(mode => mode.name === lobby.mode);
-    return [
-        '-game', 'csgo',
-        '-console', '-usercon',
-        '+hostname', lobby.name,
-        '+hostport', port,
-    ].concat(dynArgs);
-}
-
-module.exports = ({ workingDir, keyPool }) => ({
-    servers: modes.map(mode => ({
-        id: `csgo-${mode.id}`,
-        lobby: {
-            game: 'Counter-Strike: Global Offensive',
-            mode: mode.name,
-            ...mode.lobby,
-        }
-    })),
-    portRange: [27000, 27100],
-    getArgs,
-    command: {
-        win32: 'srcds.exe',
-        linux: 'srcds_run',
+const modes = [
+    {
+        id: 'casual',
+        name: 'Classic Casual',
+        lobby: { minPlayers: 4, maxPlayers: 20, publicInfo: headline + publicCasual },
+        // prettier-ignore
+        args: [
+            '+game_type', '0',
+            '+game_mode', '0',
+            '+mapgroup', 'mg_active',
+            '+map', 'de_dust2'
+        ],
     },
-    options: {
-        cwd: workingDir,
-        stdio: 'inherit',
+    {
+        id: 'comp',
+        name: 'Classic Competitive',
+        lobby: { minPlayers: 5, maxPlayers: 10, publicInfo: headline + publicComp },
+        // prettier-ignore
+        args: [
+            '+game_type', '0',
+            '+game_mode', '1',
+            '+mapgroup', 'mg_active',
+            '+map', 'de_dust2'
+        ],
     },
-    query: source,
-});
+    {
+        id: 'gungame',
+        name: 'Arms Race',
+        lobby: { minPlayers: 2, maxPlayers: 10, publicInfo: headline + publicGungame },
+        // prettier-ignore
+        args: [
+            '+game_type', '1',
+            '+game_mode', '0',
+            '+mapgroup', 'mg_armsrace',
+            '+map', 'ar_shoots',
+        ],
+    },
+    {
+        id: 'demo',
+        name: 'Demolition',
+        lobby: { minPlayers: 2, maxPlayers: 10, publicInfo: headline + publicDemo },
+        // prettier-ignore
+        args: [
+            '+game_type', '1',
+            '+game_mode', '1',
+            '+mapgroup', 'mg_demolition',
+            '+map', 'de_lake',
+        ],
+    },
+];
+
+module.exports = ({ workingDir, keyPool = [] }) => {
+    const mappedKeys = {};
+    const getKey = port => {
+        const used = Object.values(mappedKeys);
+        const key = keyPool.find(k => !used.includes(k));
+        mappedKeys[port] = key;
+        return key;
+    };
+
+    return {
+        servers: modes.map(mode => ({
+            id: `csgo-${mode.id}`,
+            lobby: {
+                game: 'Counter-Strike: Global Offensive',
+                mode: mode.name,
+                ...mode.lobby,
+            },
+        })),
+        portRange: [27000, 27100],
+        getArgs: ({ lobby, port }) => {
+            // prettier-ignore
+            const args = [
+                '-game', 'csgo',
+                '-console', '-usercon',
+                '+hostname', lobby.name,
+                '+hostport', port,
+            ];
+            const key = getKey(port);
+            if (key) args.push('-authkey', key);
+
+            const { args: dynArgs } = modes.find(mode => mode.name === lobby.mode);
+            args.push(...dynArgs);
+
+            return args;
+        },
+        onDestroy: ({ lobby, port }) => {
+            delete mappedKeys[port];
+        },
+        command: {
+            win32: 'srcds.exe',
+            linux: 'srcds_run',
+        },
+        options: {
+            cwd: workingDir,
+            stdio: 'inherit',
+        },
+        query: source,
+    };
+};
