@@ -98,7 +98,7 @@ module.exports = ({ workingDir, keyPool = [] }) => {
                 '+hostport', port,
             ];
             const key = getKey(port);
-            if (key) args.push('-authkey', key);
+            if (key) args.push('+sv_setsteamaccount', key);
 
             const { args: dynArgs } = modes.find(mode => mode.name === lobby.mode);
             args.push(...dynArgs);
