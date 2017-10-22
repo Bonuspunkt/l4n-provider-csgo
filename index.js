@@ -110,7 +110,7 @@ module.exports = ({ workingDir, keyPool = [] }) => {
         },
         command: {
             win32: 'srcds.exe',
-            linux: 'srcds_run',
+            linux: './srcds_run',
         },
         options: {
             cwd: workingDir,
