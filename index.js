@@ -105,6 +105,9 @@ module.exports = ({ workingDir, keyPool = [] }) => {
 
             return args;
         },
+        getPrivateInfo: ({ ip, port }) => {
+            return `# [connect to server](steam://connect/${ip}:${port})`;
+        },
         onDestroy: ({ lobby, port }) => {
             delete mappedKeys[port];
         },
