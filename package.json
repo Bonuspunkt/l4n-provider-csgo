@@ -1,6 +1,6 @@
 {
   "name": "l4n-provider-csgo",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "main": "index.js",
   "scripts": {
     "lint": "eslint --ignore-path .gitignore  .",
